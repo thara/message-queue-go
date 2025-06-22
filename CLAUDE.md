@@ -55,7 +55,7 @@ This is a Redis-backed message queue implementation providing reliable message d
 ### Message Flow
 
 1. **Push**: LPUSH to queue list + HSET message data
-2. **Pull**: RPOPLPUSH queue→processing + set visibility timeout + generate receipt
+2. **Pull**: LMOVE queue→processing (RIGHT to LEFT) + set visibility timeout + generate receipt
 3. **Ack**: Verify receipt + LREM from processing + ZREM from visibility + DEL message
 
 ### Key Design Decisions
@@ -63,7 +63,7 @@ This is a Redis-backed message queue implementation providing reliable message d
 - **Visibility Timeout**: Messages become invisible to other consumers while being processed
 - **Receipt System**: Each pulled message gets unique receipt for safe acknowledgment
 - **At-least-once Delivery**: Messages remain in processing list until explicitly acknowledged
-- **FIFO Ordering**: Uses Redis Lists with RPOPLPUSH for atomic dequeue operations
+- **FIFO Ordering**: Uses Redis Lists with LMOVE for atomic dequeue operations
 
 ### Testing Approach
 

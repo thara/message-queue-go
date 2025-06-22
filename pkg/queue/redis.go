@@ -2,8 +2,6 @@ package queue
 
 import (
 	"context"
-	"crypto/rand"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -67,7 +65,7 @@ func (r *RedisQueue) PushMessage(ctx context.Context, queue string, payload []by
 }
 
 func (r *RedisQueue) PullMessage(ctx context.Context, queue string, visibilityTimeout time.Duration) (*Message, error) {
-	messageID, err := r.client.RPopLPush(ctx, r.queueKey(queue), r.processingKey(queue)).Result()
+	messageID, err := r.client.LMove(ctx, r.queueKey(queue), r.processingKey(queue), "RIGHT", "LEFT").Result()
 	if err == redis.Nil {
 		return nil, ErrQueueEmpty
 	}
@@ -150,8 +148,3 @@ func (r *RedisQueue) processingKey(queue string) string {
 	return fmt.Sprintf("mq:processing:%s", queue)
 }
 
-func generateID() string {
-	b := make([]byte, 16)
-	rand.Read(b)
-	return hex.EncodeToString(b)
-}

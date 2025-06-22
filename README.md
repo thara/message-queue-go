@@ -140,7 +140,7 @@ make docker-down    # Stop Redis container
 
 The queue uses Redis data structures to ensure reliable message delivery:
 
-- **Lists** - Main queue storage using LPUSH/RPOPLPUSH for FIFO ordering
+- **Lists** - Main queue storage using LPUSH/LMOVE for FIFO ordering
 - **Hashes** - Store message metadata and content
 - **Sorted Sets** - Track message visibility timeouts
 - **Processing Lists** - Hold messages being processed
